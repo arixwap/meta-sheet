@@ -22,3 +22,7 @@ What we want :
 - og:image
 - og:image:url
 - og:image:size
+
+
+Credit :
+- PhpSpreadsheet by PHPOffice - https://github.com/PHPOffice/PhpSpreadsheet
