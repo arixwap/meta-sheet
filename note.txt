@@ -1,0 +1,24 @@
+Flow :
+- Url sent 1 by 1 via AJAX Post
+- Backend Process divided by :
+  - start : create temp_excel, input data, save
+  - process : read temp_excel, input data, save
+  - done : read temp_excel, input data, save as new excel name, download, delete temp_excel and new excel
+- Process limited by 10 request, if posible can be much more or not limited
+
+What we want :
+- URL
+- html lang
+- canonical
+- head title
+- meta description
+- robots
+- og:title
+- og:description
+- og:url
+- og:type
+- og:locale
+- og:site_name
+- og:image
+- og:image:url
+- og:image:size
