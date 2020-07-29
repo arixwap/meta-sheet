@@ -1,104 +1,134 @@
-<?php
-/**
- * Kalo engga ngerti, coba aja baca pelan pelan dari atas ke bawah
- * Dan pahami alurnya setiap baris
- * :)
- */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Otometa - Metadata Export to Excel or Spreadsheet</title>
+    <link rel="shortcut icon" href="https://avatars3.githubusercontent.com/u/11769214" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css">
+    <style>
+        .form-control,
+        .btn,
+        .alert {
+            border-radius: 0;
+        }
 
-$data = array(
-    'url' => 'https://www.villabalisale.com/blog/how-foreigner-can-buy-a-property-in-bali'
-);
+        a {
+            color: initial;
+            transition: color 0.5s ease;
+        }
 
-// Get external content with curl
-$curl = curl_init();
-curl_setopt($curl, CURLOPT_HEADER, 0);
-curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-curl_setopt($curl, CURLOPT_URL, $data['url']);
-curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
-$content = curl_exec($curl);
-curl_close($curl);
+        a:hover {
+            text-decoration: none;
+        }
 
-// Parsing content into html
-$dom = new DOMDocument();
-@$dom->loadHTML($content);
+        h1.lead {
+            font-size: 2em;
+        }
 
-// Get html locale lang
-$nodes = $dom->getElementsByTagName('html');
-$data['html_lang'] = $nodes->item(0)->getAttribute('lang');
+        .url-list .url:nth-child(1) .btn-delete-url {
+            visibility: hidden;
+        }
+    </style>
+</head>
+<body>
 
-// Get canonical
-$tags = $dom->getElementsByTagName('link');
-for ( $i = 0; $i < $tags->length; $i++ ) {
+    <div class="container py-5 my-5">
+        <h1 class="lead text-uppercase">Convert your site metadata into spreadsheet</h1>
+        <hr>
+        <h2 class="lead mt-5 mb-3">Input Your URL</h2>
+        <form action="process.php" method="post">
+            <div class="url-list">
+                <div class="url row form-group">
+                    <div class="col">
+                        <input type="text" name="url[]" class="form-control" placeholder="http://your.url" autocomplete="off">
+                    </div>
+                    <div class="col-auto pl-0">
+                        <button type="button" class="btn-delete-url btn btn-danger rounded-circle font-weight-bolder" title="Delete this url" tabindex="-1">&times;</button>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <button type="button" class="btn-add-url btn btn-secondary mr-3">Add URL</button>
+                <button type="submit" class="btn-submit btn btn-success">Export</button>
+            </div>
+        </form>
+        <br>
+        <br>
+        <br>
+        <br>
+        <p class="mb-2">Made with &hearts; by <a href="https://www.instagram.com/arix.wap/" target="blank" class="font-weight-bolder">Arix Wap</a></p>
+        <div class="row">
+            <div class="col-auto">
+                <p class="mb-1">Credit : </p>
+            </div>
+            <div class="col">
+                <ul class="list-unstyled">
+                    <li><a href="https://github.com/PHPOffice/PhpSpreadsheet" target="blank">PhpSpreadsheet by PHPOffice</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
 
-    $tag = $tags->item($i);
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.min.js"></script>
 
-    if ( $tag->getAttribute('rel') == 'canonical' ) {
-        $data['canonical'] = $tag->getAttribute('href');
-    }
-}
+    <script>
 
-// Get html head title
-$nodes = $dom->getElementsByTagName('title');
-$data['title'] = trim($nodes->item(0)->nodeValue);
+        // Define your maximum number can input URL
+        let maxUrl = 100;
 
-// Get all meta tags
-$tags = $dom->getElementsByTagName('meta');
-for ( $i = 0; $i < $tags->length; $i++ ) {
+        // Button remove url
+        $(document).on('click', '.btn-delete-url', function() {
+            $(this).closest('.row.url').remove();
+        });
 
-    $tag = $tags->item($i);
+        // Button add url
+        $(document).on('click', '.btn-add-url', function() {
 
-    // Get meta name description & robots
-    if ( $tag->getAttribute('name') != '' ) {
-        $data[ $tag->getAttribute('name') ] = trim($tag->getAttribute('content'));
-    }
+            let elements = $('.url-list .url');
 
-    // Get meta og:
-    if ( strpos($tag->getAttribute('property'), 'og:') !== false ) {
-        $data[ $tag->getAttribute('property') ] = trim($tag->getAttribute('content'));
-    }
-}
+            if ( elements.length < maxUrl ) {
+                let element = elements.first().clone();
+                element.find('input').val('');
+                $('.url-list').append(element);
+            } else if ( $('.alert-max-url').length <= 0 ) {
+                $('form').after('<div class="alert-max-url alert alert-warning alert-dismissible fade show" role="alert">Cannot add url more than ' + maxUrl + '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
+            }
+        });
 
-echo '<pre>';
-print_r($data);
-echo '</pre>';
+        // Ajax Process - Send URL Data
+        $('form').on('submit', function(event) {
 
+            event.preventDefault();
+            let targetUrl = $(this).attr('action');
+            let urlList = $(this).serializeArray();
+            console.log(urlList);
 
-//-----------------------------------
+            // Start Loop Send Ajax
+            urlList.forEach( function(item, i) {
+                console.log(item, i);
+                $.ajax({
+                    async: false,
+                    url: targetUrl,
+                    data: [item],
+                    method: 'post',
+                    beforeSend: function() {},
+                    success: function(response, status, xhr) {
+                        console.log(response);
+                    },
+                    error: function(xhr, status) {
+                        console.log(status);
+                        console.log(xhr);
+                    }
+                })
+            });
 
+            // Open link excel file
+            console.log('Open Link Excel');
 
-require 'vendor/autoload.php';
+        });
 
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
-$spreadsheet = new Spreadsheet();
-$sheet = $spreadsheet->getActiveSheet();
-
-$sheet->setCellValue('A1', 'No');
-$sheet->setCellValue('B1', 'html_lang');
-$sheet->setCellValue('C1', 'url');
-$sheet->setCellValue('D1', 'canonical');
-$sheet->setCellValue('E1', 'title');
-$sheet->setCellValue('F1', 'meta_description');
-$sheet->setCellValue('G1', 'robots');
-
-$sheet->setCellValue('A2', '1');
-$sheet->setCellValue('B2', $data['html_lang']);
-$sheet->setCellValue('C2', $data['url']);
-$sheet->setCellValue('D2', $data['canonical']);
-$sheet->setCellValue('E2', $data['title']);
-$sheet->setCellValue('F2', $data['description']);
-$sheet->setCellValue('G2', $data['robots']);
-
-$sheet->getColumnDimension('A')->setAutoSize(true);
-$sheet->getColumnDimension('B')->setAutoSize(true);
-$sheet->getColumnDimension('C')->setAutoSize(true);
-$sheet->getColumnDimension('D')->setAutoSize(true);
-$sheet->getColumnDimension('E')->setAutoSize(true);
-$sheet->getColumnDimension('F')->setAutoSize(true);
-$sheet->getColumnDimension('G')->setAutoSize(true);
-
-$writer = new Xlsx($spreadsheet);
-$writer->save('otometa.xlsx');
-
-?>
+    </script>
+</body>
+</html>
