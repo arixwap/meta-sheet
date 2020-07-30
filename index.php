@@ -53,10 +53,9 @@
                 <button type="submit" class="btn-submit btn btn-success">Export</button>
             </div>
         </form>
-        <br>
-        <br>
-        <br>
-        <br>
+
+        <br><br><br><br>
+
         <p class="mb-2">Made with &hearts; by <a href="https://www.instagram.com/arix.wap/" target="blank" class="font-weight-bolder">Arix Wap</a></p>
         <div class="row">
             <div class="col-auto">
@@ -103,11 +102,10 @@
             event.preventDefault();
             let targetUrl = $(this).attr('action');
             let urlList = $(this).serializeArray();
-            console.log(urlList);
+            let cache;
 
             // Start Loop Send Ajax
             urlList.forEach( function(item, i) {
-                console.log(item, i);
                 $.ajax({
                     async: false,
                     url: targetUrl,
@@ -115,7 +113,10 @@
                     method: 'post',
                     beforeSend: function() {},
                     success: function(response, status, xhr) {
+                        console.log(status);
                         console.log(response);
+                        // response = $.parseJSON(response);
+                        // cache = response.cache;
                     },
                     error: function(xhr, status) {
                         console.log(status);
@@ -125,7 +126,7 @@
             });
 
             // Open link excel file
-            console.log('Open Link Excel');
+            window.open("download.php");
 
         });
 

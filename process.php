@@ -4,8 +4,28 @@ session_start();
 
 if ( ! isset($_POST['url']) ) die('403');
 
-// Identify session for generate file cache
-//
+// Generate unique session and json cache file
+if ( ! isset($_SESSION['cache']) ) {
+
+    // Loop until find unique cache filename
+    $duplicateCache = true;
+    while ($duplicateCache) {
+        $time = time();
+        if ( ! file_exists( dirname(__FILE__) . '/cache/' . $time . '.json' ) ) $duplicateCache = false;
+    }
+
+    // Set session after find unique id
+    $_SESSION['cache'] = $time;
+
+    // Create directory cache if not exist
+    if ( ! file_exists( dirname(__FILE__) . '/cache' ) ) mkdir( dirname(__FILE__) . '/cache' );
+
+    // Generate json cache file
+    $cache = fopen( dirname(__FILE__) . '/cache/' . $time . '.json', 'w' ) or die("Unable to open cache file");
+    fwrite($cache, '');
+    fclose($cache);
+
+}
 
 // Get url data from input form
 $urlList = $_POST['url'];
@@ -70,8 +90,26 @@ foreach ( $urlList as $url ) {
             }
         }
 
-        // Write into JSON
-        echo json_encode($data);
+        $cachePath = dirname(__FILE__) . '/cache/' . $_SESSION['cache'] . '.json';
+
+        // Read prev cache data and merge into current data
+        $cache = fopen( $cachePath, 'r' ) or die("Unable to read cache file");
+        $prevData = fread($cache, filesize($cachePath));
+        if ( $prevData != '' ) {
+            $prevData = json_decode($prevData);
+            $prevData[] = $data;
+            $data = $prevData;
+        } else {
+            $data = array( $data );
+        }
+        fclose( $cache );
+
+        // Write into JSON cache
+        $cache = fopen( $cachePath, 'w' ) or die("Unable to write cache file");
+        fwrite( $cache, json_encode($data) );
+        fclose( $cache );
+
+        return '200';
 
     } else {
 
