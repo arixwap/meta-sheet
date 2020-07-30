@@ -41,7 +41,7 @@
             <div class="url-list">
                 <div class="url row form-group">
                     <div class="col">
-                        <input type="text" name="url[]" class="form-control" placeholder="http://your.url" autocomplete="off">
+                        <input type="text" name="url[]" class="form-control" autocomplete="off">
                     </div>
                     <div class="col-auto pl-0">
                         <button type="button" class="btn-delete-url btn btn-danger rounded-circle font-weight-bolder" title="Delete this url" tabindex="-1">&times;</button>
@@ -53,6 +53,10 @@
                 <button type="submit" class="btn-submit btn btn-success">Export</button>
             </div>
         </form>
+
+        <div class="progress-export progress d-none">
+            <div class="progress-bar" role="progressbar"></div>
+        </div>
 
         <br><br><br><br>
 
@@ -103,20 +107,39 @@
             let targetUrl = $(this).attr('action');
             let urlList = $(this).serializeArray();
             let cache;
+            let progress = 0;
+
+            $('form').css('opacity', '0.5');
+            $('form input, form button').attr('disabled', 'disabled');
+            $('.progress-export').removeClass('d-none');
+            $('.progress-export .progress-bar').css('width', '0%');
 
             // Start Loop Send Ajax
-            urlList.forEach( function(item, i) {
+            let i = 1;
+            urlList.forEach( function(item) {
+
                 $.ajax({
-                    async: false,
+                    async: true,
                     url: targetUrl,
                     data: [item],
                     method: 'post',
-                    beforeSend: function() {},
+                    beforeSend: function() {
+                    },
                     success: function(response, status, xhr) {
-                        console.log(status);
-                        console.log(response);
-                        // response = $.parseJSON(response);
-                        // cache = response.cache;
+                        // console.log(status);
+                        // console.log(response);
+
+                        progress = parseInt( ( i / urlList.length ) * 100 );
+                        $('.progress-export .progress-bar').css('width', progress + '%');
+                        i++;
+
+                        // Check if process is complete
+                        if ( i > urlList.length )  {
+                            window.location.href = '/download.php'; // Open link excel file
+                            $('form').removeAttr('style');
+                            $('form input, form button').removeAttr('disabled');
+                        }
+
                     },
                     error: function(xhr, status) {
                         console.log(status);
@@ -124,9 +147,6 @@
                     }
                 })
             });
-
-            // Open link excel file
-            window.open("download.php");
 
         });
 
