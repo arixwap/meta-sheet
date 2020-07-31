@@ -4,6 +4,10 @@ session_start();
 
 if ( ! isset($_POST['url']) ) die('403');
 
+// Create directory cache if not exist
+$cacheDir = dirname(__FILE__) . '/cache/';
+if ( ! file_exists( $cacheDir ) ) mkdir( $cacheDir );
+
 // Generate unique session and json cache file
 if ( ! isset($_SESSION['cache']) ) {
 
@@ -11,17 +15,14 @@ if ( ! isset($_SESSION['cache']) ) {
     $duplicateCache = true;
     while ($duplicateCache) {
         $time = time();
-        if ( ! file_exists( dirname(__FILE__) . '/cache/' . $time . '.json' ) ) $duplicateCache = false;
+        if ( ! file_exists( $cacheDir . $time . '.json' ) ) $duplicateCache = false;
     }
 
     // Set session after find unique id
     $_SESSION['cache'] = $time;
 
-    // Create directory cache if not exist
-    if ( ! file_exists( dirname(__FILE__) . '/cache' ) ) mkdir( dirname(__FILE__) . '/cache' );
-
     // Generate json cache file
-    $cache = fopen( dirname(__FILE__) . '/cache/' . $time . '.json', 'w' ) or die("Unable to open cache file");
+    $cache = fopen( $cacheDir . $time . '.json', 'w' ) or die("Unable to open cache file");
     fwrite($cache, '');
     fclose($cache);
 
@@ -32,12 +33,13 @@ $urlList = $_POST['url'];
 if ( ! is_array($urlList) ) $urlList = array($urlList);
 
 // Loop URL for fetch metadata
-foreach ( $urlList as $url ) {
+foreach ( $urlList as $urlIndex => $url ) {
 
     // Check if var is valid URL
     if ( filter_var($url, FILTER_VALIDATE_URL) ) {
 
         $data = array(
+            'number' => $_POST['number'][$urlIndex],
             'url' => $url
         );
 
@@ -90,7 +92,7 @@ foreach ( $urlList as $url ) {
             }
         }
 
-        $cachePath = dirname(__FILE__) . '/cache/' . $_SESSION['cache'] . '.json';
+        $cachePath = $cacheDir . $_SESSION['cache'] . '.json';
 
         // Read prev cache data and merge into current data
         $cache = fopen( $cachePath, 'r' ) or die("Unable to read cache file");

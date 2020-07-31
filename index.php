@@ -22,56 +22,71 @@
             text-decoration: none;
         }
 
-        h1.lead {
+        .main-title {
             font-size: 2em;
+            line-height: 1.5;
         }
 
         .url-list .url:nth-child(1) .btn-delete-url {
             visibility: hidden;
         }
+
+        @media (max-width: 768px) {
+            .main-content {
+                min-height: calc(100vh - 225px);
+            }
+
+            .main-title {
+                font-size: 1.3em;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <div class="container py-5 my-5">
-        <h1 class="lead text-uppercase">Convert your site metadata into spreadsheet</h1>
-        <hr>
-        <h2 class="lead mt-5 mb-3">Input Your URL</h2>
-        <form action="process.php" method="post">
-            <div class="url-list">
-                <div class="url row form-group">
-                    <div class="col">
-                        <input type="text" name="url[]" class="form-control" autocomplete="off">
-                    </div>
-                    <div class="col-auto pl-0">
-                        <button type="button" class="btn-delete-url btn btn-danger rounded-circle font-weight-bolder" title="Delete this url" tabindex="-1">&times;</button>
+    <div class="container">
+
+        <div class="main-content py-5 mb-0 mb-md-5">
+            <header>
+                <h1 class="main-title lead text-uppercase">Convert your site metadata into spreadsheet</h1>
+                <hr>
+            </header>
+            <h2 class="form-title lead mt-5 mb-3">Input Your URL</h2>
+            <form action="process.php" method="post">
+                <div class="url-list">
+                    <div class="url row form-group">
+                        <div class="col">
+                            <input type="hidden" name="number[]" value="1">
+                            <input type="text" name="url[]" class="form-control" autocomplete="off" required>
+                        </div>
+                        <div class="col-auto pl-0">
+                            <button type="button" class="btn-delete-url btn btn-danger rounded-circle font-weight-bolder" title="Delete this url" tabindex="-1">&times;</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <button type="button" class="btn-add-url btn btn-secondary mr-3">Add URL</button>
-                <button type="submit" class="btn-submit btn btn-success">Export</button>
-            </div>
-        </form>
+                <div class="form-group">
+                    <button type="button" class="btn-add-url btn btn-secondary mr-3">Add URL</button>
+                    <button type="submit" class="btn-submit btn btn-success">Export</button>
+                </div>
+            </form>
 
-        <div class="progress-export progress d-none">
-            <div class="progress-bar" role="progressbar"></div>
+            <div class="progress-export progress d-none">
+                <div class="progress-bar" role="progressbar"></div>
+            </div>
         </div>
 
-        <br><br><br><br>
-
-        <p class="mb-2">Made with &hearts; by <a href="https://www.instagram.com/arix.wap/" target="blank" class="font-weight-bolder">Arix Wap</a></p>
-        <div class="row">
-            <div class="col-auto">
-                <p class="mb-1">Credit : </p>
-            </div>
-            <div class="col">
-                <ul class="list-unstyled">
-                    <li><a href="https://github.com/PHPOffice/PhpSpreadsheet" target="blank">PhpSpreadsheet by PHPOffice</a></li>
-                </ul>
-            </div>
-        </div>
+        <footer>
+            <hr>
+            <p class="mb-3">Made with &hearts; by <a href="https://www.instagram.com/arix.wap/" target="blank" class="font-weight-bolder">Arix Wap</a></p>
+            <p class="font-weight-bolder mb-0">Credit : </p>
+            <ul class="list-unstyled">
+                <li><a href="https://stackoverflow.com/questions/5151167/getting-meta-tags-info-using-curl-and-get-meta-tags" target="blank">Get meta tags using curl</a></li>
+                <li><a href="https://github.com/PHPOffice/PhpSpreadsheet" target="blank">PhpSpreadsheet by PHPOffice</a></li>
+                <li><a href="https://stackoverflow.com/questions/15774669/list-all-files-in-one-directory-php" target="blank">List directory in php</a></li>
+            </ul>
+        </footer>
     </div>
+
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.min.js"></script>
@@ -80,11 +95,6 @@
 
         // Define your maximum number can input URL
         let maxUrl = 100;
-
-        // Button remove url
-        $(document).on('click', '.btn-delete-url', function() {
-            $(this).closest('.row.url').remove();
-        });
 
         // Button add url
         $(document).on('click', '.btn-add-url', function() {
@@ -98,16 +108,27 @@
             } else if ( $('.alert-max-url').length <= 0 ) {
                 $('form').after('<div class="alert-max-url alert alert-warning alert-dismissible fade show" role="alert">Cannot add url more than ' + maxUrl + '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
             }
+
+            orderInputNumber();
         });
+
+        // Button remove url
+        $(document).on('click', '.btn-delete-url', function() {
+            $(this).closest('.row.url').remove();
+            orderInputNumber();
+        });
+
+        // Ordering Input Number Value
+        function orderInputNumber() {
+            $('.url-list .url input[type=hidden]').each( function(i, element) {
+                $(element).val( i + 1 );
+            });
+        }
 
         // Ajax Process - Send URL Data
         $('form').on('submit', function(event) {
 
             event.preventDefault();
-            let targetUrl = $(this).attr('action');
-            let urlList = $(this).serializeArray();
-            let cache;
-            let progress = 0;
 
             $('form').css('opacity', '0.5');
             $('form input, form button').attr('disabled', 'disabled');
@@ -116,15 +137,26 @@
 
             // Start Loop Send Ajax
             let i = 1;
-            urlList.forEach( function(item) {
+            let progress = 0;
+            let targetUrl = $(this).attr('action');
+            let urlList = $('.url-list .url');
+
+            urlList.each( function(indexElement, element) {
+
+                let dataUrl = [];
+                $(element).find('input').each( function(indexInput, input) {
+                    dataUrl.push({
+                        name: $(input).attr('name'),
+                        value: $(input).val()
+                    })
+                });
 
                 $.ajax({
                     async: true,
                     url: targetUrl,
-                    data: [item],
+                    data: dataUrl,
                     method: 'post',
-                    beforeSend: function() {
-                    },
+                    beforeSend: function() {},
                     success: function(response, status, xhr) {
                         // console.log(status);
                         // console.log(response);
@@ -139,13 +171,13 @@
                             $('form').removeAttr('style');
                             $('form input, form button').removeAttr('disabled');
                         }
-
                     },
                     error: function(xhr, status) {
                         console.log(status);
                         console.log(xhr);
                     }
                 })
+
             });
 
         });
