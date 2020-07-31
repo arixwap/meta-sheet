@@ -82,7 +82,7 @@ $sheet->getColumnDimension('G')->setAutoSize(true);
 
 // redirect output to client browser
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-header('Content-Disposition: attachment;filename="sheet.xlsx"');
+header('Content-Disposition: attachment;filename="Meta Sheet.xlsx"');
 header('Cache-Control: max-age=0');
 
 $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
