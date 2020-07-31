@@ -57,7 +57,7 @@
                     <div class="url row form-group">
                         <div class="col">
                             <input type="hidden" name="number[]" value="1">
-                            <input type="text" name="url[]" class="form-control" autocomplete="off" required>
+                            <input type="url" name="url[]" class="form-control" autocomplete="off" required>
                         </div>
                         <div class="col-auto pl-0">
                             <button type="button" class="btn-delete-url btn btn-danger rounded-circle font-weight-bolder" title="Delete this url" tabindex="-1">&times;</button>
