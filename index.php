@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Otometa - Metadata Export to Excel or Spreadsheet</title>
+    <title>Meta Sheet - Metadata Exporter to Excel Spreadsheet</title>
     <link rel="shortcut icon" href="https://avatars3.githubusercontent.com/u/11769214" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
         .form-control,
         .btn,
@@ -33,7 +34,7 @@
 
         @media (max-width: 768px) {
             .main-content {
-                min-height: calc(100vh - 225px);
+                min-height: calc(100vh - 280px);
             }
 
             .main-title {
@@ -60,7 +61,7 @@
                             <input type="url" name="url[]" class="form-control" autocomplete="off" required>
                         </div>
                         <div class="col-auto pl-0">
-                            <button type="button" class="btn-delete-url btn btn-danger rounded-circle font-weight-bolder" title="Delete this url" tabindex="-1">&times;</button>
+                            <button type="button" class="btn-delete-url btn btn-link text-danger shadow-none" title="Delete this url" tabindex="-1"><span class="fa fa-times"></span></button>
                         </div>
                     </div>
                 </div>
@@ -83,6 +84,9 @@
                 <li><a href="https://stackoverflow.com/questions/5151167/getting-meta-tags-info-using-curl-and-get-meta-tags" target="blank">Get meta tags using curl</a></li>
                 <li><a href="https://github.com/PHPOffice/PhpSpreadsheet" target="blank">PhpSpreadsheet by PHPOffice</a></li>
                 <li><a href="https://stackoverflow.com/questions/15774669/list-all-files-in-one-directory-php" target="blank">List directory in php</a></li>
+                <li><a href="https://getbootstrap.com" target="blank">Bootstrap</a></li>
+                <li><a href="https://jquery.com" target="blank">jQuery</a></li>
+                <li><a href="https://fontawesome.com/v4.7.0" target="blank">Font Awesome 4.7.0</a></li>
             </ul>
         </footer>
     </div>
