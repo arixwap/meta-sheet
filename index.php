@@ -78,7 +78,8 @@
 
         <footer>
             <hr>
-            <p class="mb-3">Made with &hearts; by <a href="https://www.instagram.com/arix.wap/" target="blank" class="font-weight-bolder">Arix Wap</a></p>
+            <p class="mb-0">Made with &hearts; by <a href="https://www.instagram.com/arix.wap/" target="blank" class="font-weight-bold">Arix Wap</a></p>
+            <p class="mb-3">Source Code : <a href="https://github.com/arixwap/meta-sheet" target="blank" class="font-weight-bold">https://github.com/arixwap/meta-sheet</a></p>
             <p class="font-weight-bolder mb-0">Credit : </p>
             <ul class="list-unstyled">
                 <li><a href="https://stackoverflow.com/questions/5151167/getting-meta-tags-info-using-curl-and-get-meta-tags" target="blank">Get meta tags using curl</a></li>
